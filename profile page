@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+        color: #333;
+    }
+    header {
+        background-color: #ff7f50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    nav {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    nav a {
+        text-decoration: none;
+        color: white;
+        background-color: #ff6347;
+        padding: 10px 20px;
+        border-radius: 8px;
+        margin: 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.3s;
+        font-size: 16px;
+    }
+    nav a:hover {
+        background-color: #ff4500;
+    }
+    .profile-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 30px;
+    }
+    .post-card {
+        background-color: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        width: 90%;
+        max-width: 600px;
+    }
+</style>
+</head>
+<body>
+
+<header>My Profile</header>
+
+<nav>
+    <a href="home.html"><i class="fas fa-house"></i> Home</a>
+    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+    <a href="login.html"><i class="fas fa-power-off"></i> Logout</a>
+</nav>
+
+<div class="profile-container" id="profilePostsContainer"></div>
+
+<script>
+    // Load only your posts from localStorage
+    const userPosts = JSON.parse(localStorage.getItem('myPosts')) || [];
+    const container = document.getElementById('profilePostsContainer');
+
+    userPosts.slice().reverse().forEach(post => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'post-card';
+        postDiv.textContent = post;
+        container.appendChild(postDiv);
+    });
+</script>
+
+</body>
+</html>
