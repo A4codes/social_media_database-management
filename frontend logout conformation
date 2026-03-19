@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logout Confirmation</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #fdfbfb, #ebedee);
+    }
+    .form-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        width: 350px;
+        text-align: center;
+    }
+    h2 {
+        color: #ff6347;
+        margin-bottom: 30px;
+    }
+    input[type="text"], input[type="password"] {
+        width: 80%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+        border-color: #ff6347;
+        outline: none;
+        box-shadow: 0 0 8px rgba(255,99,71,0.5);
+    }
+    button {
+        width: 85%;
+        padding: 12px;
+        background-color: #ff7f50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.3s;
+    }
+    button:hover {
+        background-color: #ff4500;
+    }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2><i class="fas fa-power-off"></i> Logout</h2>
+    <form action="/logout_confirm" method="POST">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit"><i class="fas fa-sign-out-alt"></i> Confirm Logout</button>
+    </form>
+</div>
+
+</body>
+</html>
