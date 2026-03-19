@@ -1,1 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logging Out...</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        color: #333;
+    }
+    .logout-message {
+        text-align: center;
+        padding: 30px 50px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        font-size: 20px;
+        font-weight: bold;
+        color: #ff6347;
+    }
+</style>
+</head>
+<body>
 
+<div class="logout-message">
+    Logging you out...
+</div>
+
+<script>
+    // Redirect to Flask logout route after 1 second
+    setTimeout(() => {
+        window.location.href = "/logout";
+    }, 1000);
+</script>
+
+</body>
+</html>
