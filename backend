@@ -1,0 +1,132 @@
+from flask import Flask, render_template, request, redirect, session
+import mysql.connector
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = "your_secret_key"
+
+# --- MySQL Connection ---
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",      # your MySQL username
+    password="root",  # your MySQL password
+    database="social_media_db"
+)
+cursor = db.cursor(dictionary=True)
+
+# --- Routes ---
+
+# Home page: show all posts
+@app.route("/")
+def index():
+    if "user_id" in session:
+        cursor.execute("""
+            SELECT posts.id, posts.content, posts.created_at, users.username
+            FROM posts JOIN users ON posts.user_id = users.id
+            ORDER BY posts.created_at DESC
+        """)
+        posts = cursor.fetchall()
+
+        # Fetch likes and comments count for each post
+        for post in posts:
+            cursor.execute("SELECT COUNT(*) AS likes_count FROM likes WHERE post_id=%s", (post['id'],))
+            post['likes'] = cursor.fetchone()['likes_count']
+            cursor.execute("SELECT COUNT(*) AS comments_count FROM comments WHERE post_id=%s", (post['id'],))
+            post['comments'] = cursor.fetchone()['comments_count']
+        return render_template("home.html", posts=posts, username=session["username"])
+    return redirect("/login")
+
+# Profile page: show only current user's posts
+@app.route("/profile")
+def profile():
+    if "user_id" in session:
+        cursor.execute("""
+            SELECT id, content, created_at
+            FROM posts
+            WHERE user_id=%s
+            ORDER BY created_at DESC
+        """, (session["user_id"],))
+        user_posts = cursor.fetchall()
+        return render_template("profile.html", posts=user_posts, username=session["username"])
+    return redirect("/login")
+
+# Register
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        try:
+            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+            db.commit()
+            return redirect("/login")
+        except mysql.connector.IntegrityError:
+            return "Username already exists!"
+    return render_template("register.html")
+
+# Login
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
+        user = cursor.fetchone()
+        if user:
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            return redirect("/")
+        else:
+            return "Invalid credentials!"
+    return render_template("login.html")
+
+# Logout
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
+# Create a post
+@app.route("/create_post", methods=["POST"])
+def create_post():
+    if "user_id" in session:
+        content = request.form["content"]
+        cursor.execute(
+            "INSERT INTO posts (user_id, content, created_at) VALUES (%s, %s, %s)",
+            (session["user_id"], content, datetime.now())
+        )
+        db.commit()
+    return redirect("/")
+
+# Like a post
+@app.route("/like/<int:post_id>")
+def like(post_id):
+    if "user_id" in session:
+        cursor.execute("SELECT * FROM likes WHERE user_id=%s AND post_id=%s", (session["user_id"], post_id))
+        if not cursor.fetchone():
+            cursor.execute("INSERT INTO likes (user_id, post_id) VALUES (%s, %s)", (session["user_id"], post_id))
+            db.commit()
+    return redirect("/")
+
+# Unlike a post
+@app.route("/unlike/<int:post_id>")
+def unlike(post_id):
+    if "user_id" in session:
+        cursor.execute("DELETE FROM likes WHERE user_id=%s AND post_id=%s", (session["user_id"], post_id))
+        db.commit()
+    return redirect("/")
+
+# Comment on a post
+@app.route("/comment/<int:post_id>", methods=["POST"])
+def comment(post_id):
+    if "user_id" in session:
+        comment_text = request.form["comment"]
+        cursor.execute(
+            "INSERT INTO comments (user_id, post_id, comment, created_at) VALUES (%s, %s, %s, %s)",
+            (session["user_id"], post_id, comment_text, datetime.now())
+        )
+        db.commit()
+    return redirect("/")
+
+if __name__ == "__main__":
+    app.run(debug=True)
